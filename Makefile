@@ -6,7 +6,7 @@
 #    By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/09/30 14:12:38 by nlaurids          #+#    #+#              #
-#    Updated: 2021/09/30 15:40:58 by nlaurids         ###   ########.fr        #
+#    Updated: 2021/10/05 17:46:17 by nlaurids         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -34,3 +34,5 @@ fclean	:	clean
 			rm -f $(NAME)
 
 re		:	fclean all
+
+.PHONY = all clean fclean re

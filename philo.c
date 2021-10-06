@@ -6,7 +6,7 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 14:16:17 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/05 17:05:55 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/06 17:01:54 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,12 +20,15 @@ void	ft_unlock(t_philo *philos, int i)
 	pthread_mutex_unlock(&philos->mutex[i]);
 }
 
-void	ft_time_set(int i, int j)
+
+int	ft_time_set(int i, int j)
 {
 	struct timeval	todms;
 
+	if (g_threads[0].win == -1)
+		return (1);
 	gettimeofday(&todms, NULL);
-	g_threads[i].time = todms.tv_sec * 1000 + todms.tv_usec / 1000;
+	g_threads[i].time = todms.tv_sec * 1000 + todms.tv_usec / 1000 - g_threads[i].initial_time;
 	g_threads[i].status = j;
 	if (j == 0)
 		printf("%d %d has taken a fork\n", g_threads[i].time, i + 1);
@@ -39,6 +42,7 @@ void	ft_time_set(int i, int j)
 		printf("%d %d is thinking\n", g_threads[i].time, i + 1);
 	if (j == 4)
 		printf("%d %d died\n", g_threads[i].time, i + 1);
+	return (0);
 }
 
 void	*ft_philoop(void *args)
@@ -66,7 +70,7 @@ void	*ft_philoop(void *args)
 	else
 		g_threads[i].right = i + 1;
 	ft_time_set(i, -1);
-	g_threads[i].time_last_eat = g_threads->time;
+	g_threads[i].time_last_eat = g_threads[i].time;
 	while (1)
 	{
 		if (g_threads[g_threads[i].left].status == 1 && g_threads[g_threads[i].left].time_last_eat - g_threads[i].time_last_eat - philos->time_to_eat > philos->time_to_die)
@@ -76,7 +80,11 @@ void	*ft_philoop(void *args)
 			return (0);
 		}
 		pthread_mutex_lock(&philos->mutex[g_threads[i].left]);
-		ft_time_set(i, 0);
+		if (ft_time_set(i, 0))
+		{
+			pthread_mutex_unlock(&philos->mutex[g_threads[i].left]);
+			return (0);
+		}
 		if (g_threads[g_threads[i].right].status == 1 && g_threads[g_threads[i].right].time_last_eat - g_threads[i].time_last_eat - philos->time_to_eat > philos->time_to_die)
 		{
 			usleep(philos->time_to_die - g_threads[i].time + g_threads[i].time_last_eat);
@@ -84,8 +92,16 @@ void	*ft_philoop(void *args)
 			return (0);
 		}
 		pthread_mutex_lock(&philos->mutex[i]);
-		ft_time_set(i, 0);
-		ft_time_set(i, 1);
+		if (ft_time_set(i, 0))
+		{
+			ft_unlock(philos, i);
+			return (0);
+		}
+		if (ft_time_set(i, 1))
+		{
+			ft_unlock(philos, i);
+			return (0);
+		}
 		if (philos->time_to_eat > philos->time_to_die)
 		{
 			usleep(philos->time_to_die * 1000);
@@ -95,10 +111,12 @@ void	*ft_philoop(void *args)
 		}
 		usleep(philos->time_to_eat * 1000);
 		if (++j == philos->wincon)
+			g_threads[0].win++;
+		if (ft_time_set(i, 2))
+		{
 			ft_unlock(philos, i);
-		if (j == philos->wincon)
 			return (0);
-		ft_time_set(i, 2);
+		}
 		ft_unlock(philos, i);
 		if (philos->time_to_eat + philos->time_to_sleep > philos->time_to_die)
 		{
@@ -107,23 +125,58 @@ void	*ft_philoop(void *args)
 			return (0);
 		}
 		usleep(philos->time_to_sleep * 1000);
-		ft_time_set(i, 3);
+		if (ft_time_set(i, 3))
+			return (0);
+	}
+	return (0);
+}
+
+void	*ft_checkloop(void *args)
+{
+	t_philo			*philos;
+	int				i;
+	struct timeval	todms;
+
+	philos = (t_philo *)args;
+	while (1)
+	{
+		i = -1;
+		while (++i < philos->num_of_philo)
+		{
+			gettimeofday(&todms, NULL);
+			if (todms.tv_sec * 1000 + todms.tv_usec / 1000 - g_threads[i].initial_time - g_threads[i].time_last_eat > philos->time_to_die)
+			{
+				g_threads[0].win = -1;
+				return (0);
+			}
+		}
+		if (g_threads[0].win == philos->num_of_philo)
+		{
+			g_threads[0].win = -1;
+			return (0);
+		}
 	}
 	return (0);
 }
 
 int	ft_philos(t_philo *philo)
 {
-	int	i;
+	int				i;
+	struct timeval	t;
 
 	i = -1;
+	g_threads[0].win = 0;
 	while (++i < philo->num_of_philo)
 	{
 		philo->index = i;
+		gettimeofday(&t, NULL);
+		g_threads[i].initial_time = t.tv_sec * 1000 + t.tv_usec / 1000;
 		if (pthread_create(&philo->pthread[i], NULL, ft_philoop, (void *)philo))
 			return (0);
-		usleep(10);
+		usleep(1);
 	}
+	if (pthread_create(&philo->pthread[i], NULL, ft_checkloop, (void *)philo))
+		return (0);
 	i = -1;
 	while (++i < philo->num_of_philo)
 	{
@@ -138,15 +191,15 @@ int	ft_pthread(t_philo *philo)
 {
 	int	i;
 
-	philo->pthread = malloc(sizeof(pthread_t) * philo->num_of_philo);
+	philo->pthread = malloc(sizeof(pthread_t) * philo->num_of_philo + 1);
 	if (!philo->pthread)
 		return (0);
 	philo->mutex = malloc(sizeof(pthread_mutex_t) * philo->num_of_philo);
 	if (!philo->mutex)
-		return (ft_clearall(0, philo));
+		return (0);
 	g_threads = malloc(sizeof(g_threads) * philo->num_of_philo);
 	if (!g_threads)
-		return (ft_clearall(0, philo));
+		return (0);
 	i = 0;
 	while (i < philo->num_of_philo)
 	{
@@ -154,8 +207,9 @@ int	ft_pthread(t_philo *philo)
 		pthread_mutex_init(&philo->mutex[i++], NULL);
 	}
 	if (!(ft_philos(philo)))
-		return (ft_clearall(0, philo));
-	return (ft_clearall(1, philo));
+		return (0);
+	usleep(philo->time_to_die);
+	return (1);
 }
 
 int	main(int argc, char **argv)
@@ -167,6 +221,6 @@ int	main(int argc, char **argv)
 	if (!(ft_parse(argc, argv, &philo)))
 		return (1);
 	if (!(ft_pthread(&philo)))
-		return (1);
+		return (ft_clearall(&philo, g_threads));
 	return (0);
 }

@@ -6,28 +6,21 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 14:31:40 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/05 14:39:44 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/06 16:43:49 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	ft_clearall(int ret, t_philo *philo)
+int	ft_clearall(t_philo *philo, t_threads *g_threads)
 {
-	int	i;
-
-	i = 0;
-	while (i < philo->num_of_philo)
-	{
-		pthread_detach(philo->pthread[i]);
-		pthread_mutex_destroy(&philo->mutex[i]);
-		i++;
-	}
+	if (g_threads)
+		free(g_threads);
 	if (philo->pthread)
 		free(philo->pthread);
 	if (philo->mutex)
 		free(philo->mutex);
-	return (ret);
+	return (1);
 }
 
 int	ft_is_num(char *str)
