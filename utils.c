@@ -6,18 +6,16 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 14:31:40 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/06 16:43:49 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/07 16:36:32 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	ft_clearall(t_philo *philo, t_threads *g_threads)
+int	ft_clearall(t_philo *philo)
 {
-	if (g_threads)
-		free(g_threads);
-	if (philo->pthread)
-		free(philo->pthread);
+	if (philo->threads)
+		free(philo->threads);
 	if (philo->mutex)
 		free(philo->mutex);
 	return (1);
