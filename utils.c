@@ -6,11 +6,19 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 14:31:40 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/07 16:36:32 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/08 13:04:44 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
+
+unsigned long	ft_set_time(void)
+{
+	struct timeval	todms;
+
+	gettimeofday(&todms, NULL);
+	return (todms.tv_sec * 1000 + todms.tv_usec / 1000);
+}
 
 int	ft_clearall(t_philo *philo)
 {

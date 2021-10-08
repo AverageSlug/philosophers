@@ -6,7 +6,7 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 14:16:11 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/07 18:36:22 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/08 14:29:15 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,8 +25,9 @@ typedef struct s_threads
 	int	left;
 	int	status;
 	int	time;
-	int	time_last_eat;
+	int	last_eat;
 	int	win;
+	int	done;
 }	t_threads;
 
 typedef struct s_philo
@@ -42,11 +43,12 @@ typedef struct s_philo
 	t_threads		*threads;
 }	t_philo;
 
-void	*ft_checkloop(void *args);
-void	*ft_philoop(void *args);
-int		ft_parse(int n, char **args, t_philo *philo);
-int		ft_atoi(char *str);
-int		ft_is_num(char *str);
-int		ft_clearall(t_philo *philo);
+unsigned long	ft_set_time(void);
+void			*ft_checkloop(void *args);
+void			*ft_philoop(void *args);
+int				ft_parse(int n, char **args, t_philo *philo);
+int				ft_atoi(char *str);
+int				ft_is_num(char *str);
+int				ft_clearall(t_philo *philo);
 
 #endif
