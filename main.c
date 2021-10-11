@@ -6,7 +6,7 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/07 18:34:35 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/08 14:51:12 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/11 12:35:15 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,6 +65,7 @@ int	ft_pthread(t_philo *philo)
 		pthread_mutex_init(&philo->mutex[i++], NULL);
 	}
 	pthread_mutex_init(&philo->dead, NULL);
+	pthread_mutex_init(&philo->write, NULL);
 	if (!(ft_philos(philo)))
 		return (0);
 	return (1);
@@ -75,11 +76,20 @@ int	main(int argc, char **argv)
 	t_philo	philo;
 
 	if (argc < 5 || argc > 6)
+	{
+		printf("Error: Wrong number of arguments\n");
 		return (1);
+	}
 	if (!(ft_parse(argc, argv, &philo)))
+	{
+		printf("Error: Invalid arguments\n");
 		return (1);
+	}
 	if (!(ft_pthread(&philo)))
+	{
+		printf("Error: Program failed\n");
 		return (ft_clearall(&philo));
+	}
 	ft_clearall(&philo);
 	return (0);
 }
