@@ -6,7 +6,7 @@
 #    By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/09/30 14:12:38 by nlaurids          #+#    #+#              #
-#    Updated: 2021/10/07 18:34:31 by nlaurids         ###   ########.fr        #
+#    Updated: 2021/10/18 14:50:21 by nlaurids         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -17,6 +17,7 @@ CFLAGS		=	-Wall -Wextra -Werror
 
 SRCS		=	main.c \
 				philo.c \
+				misc.c \
 				utils.c
 
 INC			= 	philo.h

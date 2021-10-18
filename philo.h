@@ -6,7 +6,7 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 14:16:11 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/11 12:24:56 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/18 14:37:47 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,16 +19,16 @@
 # include <pthread.h>
 # include <sys/time.h>
 
+struct	s_philo;
+
 typedef struct s_threads
 {
-	int	initial_time;
-	int	left;
-	int	status;
-	int	time;
-	int	limit;
-	int	last;
-	int	win;
-	int	done;
+	int				index;
+	int				left;
+	int				status;
+	int				time;
+	int				done;
+	struct s_philo	*philo;
 }	t_threads;
 
 typedef struct s_philo
@@ -37,15 +37,22 @@ typedef struct s_philo
 	int				time_to_die;
 	int				time_to_eat;
 	int				time_to_sleep;
+	int				init;
 	int				wincon;
-	int				index;
+	int				win;
+	int				*last;
+	int				*limit;
+	int				end;
+	pthread_t		*pthread;
 	pthread_mutex_t	*mutex;
-	pthread_mutex_t	dead;
 	pthread_mutex_t	write;
+	pthread_mutex_t	protect;
 	t_threads		*threads;
 }	t_philo;
 
 unsigned long	ft_set_time(void);
+void			ft_usleep(unsigned long sleep_time);
+int				ft_print(int j, t_threads *threads);
 void			*ft_checkloop(void *args);
 void			*ft_philoop(void *args);
 int				ft_parse(int n, char **args, t_philo *philo);

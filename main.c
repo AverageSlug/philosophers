@@ -6,7 +6,7 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/07 18:34:35 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/11 12:35:15 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/18 14:37:37 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,37 +14,54 @@
 
 int	ft_philo_create(t_philo *philo, int i)
 {
-	pthread_t	pthread;
-
 	while (i < philo->num_of_philo)
 	{
-		philo->index = i;
-		if (pthread_create(&pthread, NULL, ft_philoop, (void *)philo))
+		philo->threads[i].philo = philo;
+		philo->threads[i].index = i;
+		if (pthread_create(&philo->pthread[i], NULL, ft_philoop,
+				(void *)&philo->threads[i]))
 			return (1);
-		pthread_detach(pthread);
 		i += 2;
 		usleep(20);
 	}
 	return (0);
 }
 
-int	ft_philos(t_philo *philo)
+int	ft_create_all(t_philo *philo)
 {
-	pthread_t	pthread;
-
-	philo->threads[0].win = 0;
-	philo->threads[0].initial_time = ft_set_time();
 	if (ft_philo_create(philo, 0))
 		return (0);
+	ft_usleep(10);
 	if (ft_philo_create(philo, 1))
 		return (0);
-	if (pthread_create(&pthread, NULL, ft_checkloop, (void *)philo))
+	ft_usleep(10);
+	if (pthread_create(&philo->pthread[philo->num_of_philo], NULL,
+			ft_checkloop, (void *)philo))
 		return (0);
-	pthread_detach(pthread);
-	usleep(60);
-	pthread_mutex_lock(&philo->dead);
-	pthread_mutex_unlock(&philo->dead);
-	usleep(1000);
+	return (1);
+}
+
+int	ft_philos(t_philo *philo)
+{
+	int	i;
+
+	philo->win = 0;
+	philo->end = 0;
+	philo->init = ft_set_time();
+	philo->pthread = malloc(sizeof(pthread_t) * (philo->num_of_philo + 1));
+	if (!philo->pthread)
+		return (0);
+	philo->last = malloc(sizeof(int) * philo->num_of_philo);
+	if (!philo->last)
+		return (0);
+	philo->limit = malloc(sizeof(int) * philo->num_of_philo);
+	if (!philo->limit)
+		return (0);
+	i = 0;
+	while (i < philo->num_of_philo)
+		philo->last[i++] = ft_set_time();
+	if (!ft_create_all(philo))
+		return (0);
 	return (1);
 }
 
@@ -60,14 +77,17 @@ int	ft_pthread(t_philo *philo)
 		return (0);
 	i = 0;
 	while (i < philo->num_of_philo)
-	{
-		philo->threads[i].status = 5;
-		pthread_mutex_init(&philo->mutex[i++], NULL);
-	}
-	pthread_mutex_init(&philo->dead, NULL);
-	pthread_mutex_init(&philo->write, NULL);
+		if (pthread_mutex_init(&philo->mutex[i++], NULL))
+			return (0);
+	if (pthread_mutex_init(&philo->write, NULL))
+		return (0);
+	if (pthread_mutex_init(&philo->protect, NULL))
+		return (0);
 	if (!(ft_philos(philo)))
 		return (0);
+	i = 0;
+	while (i <= philo->num_of_philo)
+		pthread_join(philo->pthread[i++], NULL);
 	return (1);
 }
 

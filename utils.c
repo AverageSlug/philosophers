@@ -6,7 +6,7 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 14:31:40 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/11 11:54:58 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/18 14:52:29 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,14 @@ int	ft_clearall(t_philo *philo)
 
 	if (philo->threads)
 		free(philo->threads);
-	pthread_mutex_destroy(&philo->dead);
+	if (philo->last)
+		free(philo->last);
+	if (philo->limit)
+		free(philo->limit);
+	if (philo->pthread)
+		free(philo->pthread);
 	pthread_mutex_destroy(&philo->write);
+	pthread_mutex_destroy(&philo->protect);
 	i = -1;
 	while (++i < philo->num_of_philo)
 		pthread_mutex_destroy(&philo->mutex[i]);

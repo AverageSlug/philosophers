@@ -6,123 +6,129 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 14:16:17 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/11 12:36:01 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/18 14:41:02 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	ft_usleep(unsigned long sleep_time)
+int	ft_sleepthink(t_threads *threads)
 {
-	unsigned long	end;
-
-	end = ft_set_time() + sleep_time;
-	while (ft_set_time() < end)
-		usleep(100);
-}
-
-int	ft_print(int i, int j, t_threads *threads, pthread_mutex_t *write)
-{
-	if (threads[0].win == -1 && j != 4)
+	if (++threads->done == threads->philo->wincon)
+	{
+		pthread_mutex_lock(&threads->philo->protect);
+		threads->philo->win++;
+		pthread_mutex_unlock(&threads->philo->protect);
+	}
+	pthread_mutex_lock(&threads->philo->write);
+	if (!(ft_print(2, threads)))
+	{
+		pthread_mutex_unlock(&threads->philo->write);
 		return (0);
-	threads[i].status = j;
-	threads[i].time = ft_set_time() - threads[0].initial_time;
-	pthread_mutex_lock(write);
-	if (j == 0)
-		printf("%d %d has taken a fork\n", threads[i].time, i + 1);
-	if (j == 1)
-		threads[i].last = threads[i].time + threads[0].initial_time;
-	if (j == 1)
-		printf("%d %d is eating\n", threads[i].time, i + 1);
-	if (j == 2)
-		printf("%d %d is sleeping\n", threads[i].time, i + 1);
-	if (j == 3)
-		printf("%d %d is thinking\n", threads[i].time, i + 1);
-	if (j == 4)
-		printf("%d %d died\n", threads[i].time, i + 1);
-	pthread_mutex_unlock(write);
+	}
+	pthread_mutex_unlock(&threads->philo->write);
+	ft_usleep(threads->philo->time_to_sleep);
+	pthread_mutex_lock(&threads->philo->write);
+	if (!(ft_print(3, threads)))
+	{
+		pthread_mutex_unlock(&threads->philo->write);
+		return (0);
+	}
+	pthread_mutex_unlock(&threads->philo->write);
 	return (1);
 }
 
-int	ft_theloop(t_philo *philos, int i)
+int	ft_theloop(t_threads *threads)
 {
-	pthread_mutex_lock(&philos->mutex[philos->threads[i].left]);
-	if (!(ft_print(i, 0, philos->threads, &philos->write)))
+	pthread_mutex_lock(&threads->philo->mutex[threads->left]);
+	pthread_mutex_lock(&threads->philo->write);
+	if (!(ft_print(0, threads)))
 	{
-		pthread_mutex_unlock(&philos->mutex[philos->threads[i].left]);
+		pthread_mutex_unlock(&threads->philo->mutex[threads->left]);
+		pthread_mutex_unlock(&threads->philo->write);
 		return (0);
 	}
-	pthread_mutex_lock(&philos->mutex[i]);
-	ft_print(i, 0, philos->threads, &philos->write);
-	if (!(ft_print(i, 1, philos->threads, &philos->write)))
+	pthread_mutex_unlock(&threads->philo->write);
+	pthread_mutex_lock(&threads->philo->mutex[threads->index]);
+	pthread_mutex_lock(&threads->philo->write);
+	if (!ft_print(0, threads) || !(ft_print(1, threads)))
 	{
-		pthread_mutex_unlock(&philos->mutex[philos->threads[i].left]);
-		pthread_mutex_unlock(&philos->mutex[i]);
+		pthread_mutex_unlock(&threads->philo->mutex[threads->left]);
+		pthread_mutex_unlock(&threads->philo->mutex[threads->index]);
+		pthread_mutex_unlock(&threads->philo->write);
 		return (0);
 	}
-	ft_usleep(philos->time_to_eat);
-	pthread_mutex_unlock(&philos->mutex[philos->threads[i].left]);
-	pthread_mutex_unlock(&philos->mutex[i]);
-	if (++philos->threads[i].done == philos->wincon)
-		philos->threads[0].win++;
-	if (!(ft_print(i, 2, philos->threads, &philos->write)))
-		return (0);
-	ft_usleep(philos->time_to_sleep);
-	if (!(ft_print(i, 3, philos->threads, &philos->write)))
+	pthread_mutex_unlock(&threads->philo->write);
+	ft_usleep(threads->philo->time_to_eat);
+	pthread_mutex_unlock(&threads->philo->mutex[threads->left]);
+	pthread_mutex_unlock(&threads->philo->mutex[threads->index]);
+	if (!ft_sleepthink(threads))
 		return (0);
 	return (1);
 }
 
 void	*ft_philoop(void *args)
 {
-	t_philo			*philos;
-	int				i;
+	t_threads			*threads;
 
-	philos = (t_philo *)args;
-	i = philos->index;
-	philos->threads[i].done = 0;
-	philos->threads[i].last = ft_set_time();
-	ft_print(i, 3, philos->threads, &philos->write);
-	if (philos->num_of_philo == 1)
+	threads = (t_threads *)args;
+	threads->done = 0;
+	pthread_mutex_lock(&threads->philo->write);
+	ft_print(3, threads);
+	if (threads->philo->num_of_philo == 1)
 	{
-		ft_print(i, 0, philos->threads, &philos->write);
-		ft_usleep(philos->time_to_die);
+		ft_print(0, threads);
+		ft_usleep(threads->philo->time_to_die);
+		pthread_mutex_unlock(&threads->philo->write);
 		return (0);
 	}
-	if (!i)
-		philos->threads[i].left = philos->num_of_philo - 1;
+	pthread_mutex_unlock(&threads->philo->write);
+	if (!threads->index)
+		threads->left = threads->philo->num_of_philo - 1;
 	else
-		philos->threads[i].left = i - 1;
-	while (ft_theloop(philos, i))
+		threads->left = threads->index - 1;
+	while (ft_theloop(threads))
 		continue ;
+	return (0);
+}
+
+int	ft_check(t_philo *philo, int *i)
+{
+	while (++(*i) < philo->num_of_philo)
+	{
+		pthread_mutex_lock(&philo->write);
+		philo->limit[*i] = ft_set_time() - philo->last[*i];
+		pthread_mutex_unlock(&philo->write);
+		if (philo->limit[*i] >= philo->time_to_die)
+			return (1);
+	}
 	return (0);
 }
 
 void	*ft_checkloop(void *args)
 {
-	t_philo			*philos;
-	int				i;
+	t_philo		*philo;
+	int			i;
 
-	philos = (t_philo *)args;
-	pthread_mutex_lock(&philos->dead);
-	while (philos->threads[0].win != philos->num_of_philo)
+	philo = (t_philo *)args;
+	pthread_mutex_lock(&philo->protect);
+	while (philo->win != philo->num_of_philo)
 	{
+		pthread_mutex_unlock(&philo->protect);
 		i = -1;
-		while (++i < philos->num_of_philo)
-		{
-			philos->threads[i].limit = ft_set_time()
-				- philos->threads[i].last;
-			if (philos->threads[i].limit >= philos->time_to_die)
-				break ;
-			usleep(20);
-		}
-		if (i != philos->num_of_philo && philos->threads[i++].limit
-			>= philos->time_to_die)
+		if (ft_check(philo, &i))
 			break ;
+		pthread_mutex_lock(&philo->protect);
 	}
-	philos->threads[0].win = -1;
-	if (philos->threads[--i].limit >= philos->time_to_die)
-		ft_print(i, 4, philos->threads, &philos->write);
-	pthread_mutex_unlock(&philos->dead);
+	if (philo->win != philo->num_of_philo)
+		pthread_mutex_lock(&philo->protect);
+	if (philo->win == philo->num_of_philo)
+		i--;
+	philo->end = -1;
+	pthread_mutex_unlock(&philo->protect);
+	pthread_mutex_lock(&philo->write);
+	if (philo->limit[i] >= philo->time_to_die)
+		printf("%d %d died\n", (int)(ft_set_time() - philo->init), i + 1);
+	pthread_mutex_unlock(&philo->write);
 	return (0);
 }
