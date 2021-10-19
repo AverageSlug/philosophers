@@ -6,7 +6,7 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/18 14:15:42 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/19 13:51:04 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/19 13:58:31 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,5 @@ int	ft_print(int j, t_threads *threads)
 		printf("%d %d is sleeping\n", threads->time, threads->index + 1);
 	if (j == 3)
 		printf("%d %d is thinking\n", threads->time, threads->index + 1);
-	if (j == 4)
-		printf("%d %d died\n", threads->time, threads->index + 1);
 	return (1);
 }
