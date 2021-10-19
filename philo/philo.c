@@ -6,7 +6,7 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 14:16:17 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/18 14:41:02 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/19 13:52:15 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@ int	ft_sleepthink(t_threads *threads)
 		return (0);
 	}
 	pthread_mutex_unlock(&threads->philo->write);
-	ft_usleep(threads->philo->time_to_sleep);
+	ft_usleep(threads->philo->time_to_sleep, threads);
 	pthread_mutex_lock(&threads->philo->write);
 	if (!(ft_print(3, threads)))
 	{
@@ -59,7 +59,7 @@ int	ft_theloop(t_threads *threads)
 		return (0);
 	}
 	pthread_mutex_unlock(&threads->philo->write);
-	ft_usleep(threads->philo->time_to_eat);
+	ft_usleep(threads->philo->time_to_eat, threads);
 	pthread_mutex_unlock(&threads->philo->mutex[threads->left]);
 	pthread_mutex_unlock(&threads->philo->mutex[threads->index]);
 	if (!ft_sleepthink(threads))
@@ -78,7 +78,7 @@ void	*ft_philoop(void *args)
 	if (threads->philo->num_of_philo == 1)
 	{
 		ft_print(0, threads);
-		ft_usleep(threads->philo->time_to_die);
+		ft_usleep(threads->philo->time_to_die, threads);
 		pthread_mutex_unlock(&threads->philo->write);
 		return (0);
 	}

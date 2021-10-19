@@ -6,18 +6,18 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/18 14:15:42 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/18 14:37:59 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/19 13:51:04 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-void	ft_usleep(unsigned long sleep_time)
+void	ft_usleep(unsigned long sleep_time, t_threads *threads)
 {
 	unsigned long	end;
 
 	end = ft_set_time() + sleep_time;
-	while (ft_set_time() < end)
+	while (ft_set_time() < end && !threads->philo->end)
 		usleep(100);
 }
 

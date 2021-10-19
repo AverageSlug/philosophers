@@ -6,7 +6,7 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 14:16:11 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/18 14:37:47 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/19 13:50:39 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ typedef struct s_philo
 }	t_philo;
 
 unsigned long	ft_set_time(void);
-void			ft_usleep(unsigned long sleep_time);
+void			ft_usleep(unsigned long sleep_time, t_threads *threads);
 int				ft_print(int j, t_threads *threads);
 void			*ft_checkloop(void *args);
 void			*ft_philoop(void *args);

@@ -6,7 +6,7 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/07 18:34:35 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/18 14:37:37 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/19 13:52:43 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,10 +31,10 @@ int	ft_create_all(t_philo *philo)
 {
 	if (ft_philo_create(philo, 0))
 		return (0);
-	ft_usleep(10);
+	ft_usleep(10, philo->threads);
 	if (ft_philo_create(philo, 1))
 		return (0);
-	ft_usleep(10);
+	ft_usleep(10, philo->threads);
 	if (pthread_create(&philo->pthread[philo->num_of_philo], NULL,
 			ft_checkloop, (void *)philo))
 		return (0);
