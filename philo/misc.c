@@ -6,7 +6,7 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/18 14:15:42 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/19 13:58:31 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/19 14:24:49 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void	ft_usleep(unsigned long sleep_time, t_threads *threads)
 int	ft_print(int j, t_threads *threads)
 {
 	pthread_mutex_lock(&threads->philo->protect);
-	if (threads->philo->end == -1 && j != 4)
+	if (threads->philo->end == -1)
 	{
 		pthread_mutex_unlock(&threads->philo->protect);
 		return (0);
