@@ -6,7 +6,7 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 14:16:17 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/22 15:34:40 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/22 15:59:47 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,14 +94,19 @@ void	*ft_philoop(void *args)
 
 int	ft_check(t_philo *philo, int *i)
 {
+	pthread_mutex_unlock(&philo->protect);
 	while (++(*i) < philo->num_of_philo)
 	{
 		pthread_mutex_lock(&philo->write);
 		philo->limit[*i] = ft_set_time() - philo->last[*i];
 		pthread_mutex_unlock(&philo->write);
 		if (philo->limit[*i] >= philo->time_to_die)
+		{
+			pthread_mutex_lock(&philo->protect);
 			return (1);
+		}
 	}
+	pthread_mutex_lock(&philo->protect);
 	return (0);
 }
 
@@ -114,14 +119,9 @@ void	*ft_checkloop(void *args)
 	pthread_mutex_lock(&philo->protect);
 	while (philo->win != philo->num_of_philo)
 	{
-		pthread_mutex_unlock(&philo->protect);
 		i = -1;
 		if (ft_check(philo, &i))
-		{
-			pthread_mutex_lock(&philo->protect);
 			break ;
-		}
-		pthread_mutex_lock(&philo->protect);
 	}
 	if (philo->win == philo->num_of_philo)
 		i--;
