@@ -6,7 +6,7 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 14:16:17 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/19 13:52:15 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/22 15:34:40 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,18 +117,21 @@ void	*ft_checkloop(void *args)
 		pthread_mutex_unlock(&philo->protect);
 		i = -1;
 		if (ft_check(philo, &i))
+		{
+			pthread_mutex_lock(&philo->protect);
 			break ;
+		}
 		pthread_mutex_lock(&philo->protect);
 	}
-	if (philo->win != philo->num_of_philo)
-		pthread_mutex_lock(&philo->protect);
 	if (philo->win == philo->num_of_philo)
 		i--;
-	philo->end = -1;
 	pthread_mutex_unlock(&philo->protect);
+	pthread_mutex_lock(&philo->exit);
+	philo->end = -1;
+	pthread_mutex_unlock(&philo->exit);
 	pthread_mutex_lock(&philo->write);
 	if (philo->limit[i] >= philo->time_to_die)
-		printf("%d %d died\n", (int)(ft_set_time() - philo->init), i + 1);
+		printf("%d %d died\n", (int)ft_set_time() - philo->init, i + 1);
 	pthread_mutex_unlock(&philo->write);
 	return (0);
 }

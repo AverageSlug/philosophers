@@ -6,7 +6,7 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/07 18:34:35 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/19 13:52:43 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/22 15:53:10 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,6 +82,8 @@ int	ft_pthread(t_philo *philo)
 	if (pthread_mutex_init(&philo->write, NULL))
 		return (0);
 	if (pthread_mutex_init(&philo->protect, NULL))
+		return (0);
+	if (pthread_mutex_init(&philo->exit, NULL))
 		return (0);
 	if (!(ft_philos(philo)))
 		return (0);

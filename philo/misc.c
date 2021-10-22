@@ -6,7 +6,7 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/18 14:15:42 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/19 14:24:49 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/22 15:47:47 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,19 +17,25 @@ void	ft_usleep(unsigned long sleep_time, t_threads *threads)
 	unsigned long	end;
 
 	end = ft_set_time() + sleep_time;
+	pthread_mutex_lock(&threads->philo->exit);
 	while (ft_set_time() < end && !threads->philo->end)
-		usleep(100);
+	{
+		pthread_mutex_unlock(&threads->philo->exit);
+		usleep(200);
+		pthread_mutex_lock(&threads->philo->exit);
+	}
+	pthread_mutex_unlock(&threads->philo->exit);
 }
 
 int	ft_print(int j, t_threads *threads)
 {
-	pthread_mutex_lock(&threads->philo->protect);
+	pthread_mutex_lock(&threads->philo->exit);
 	if (threads->philo->end == -1)
 	{
-		pthread_mutex_unlock(&threads->philo->protect);
+		pthread_mutex_unlock(&threads->philo->exit);
 		return (0);
 	}
-	pthread_mutex_unlock(&threads->philo->protect);
+	pthread_mutex_unlock(&threads->philo->exit);
 	threads->time = ft_set_time() - threads->philo->init;
 	if (j == 0)
 		printf("%d %d has taken a fork\n", threads->time, threads->index + 1);

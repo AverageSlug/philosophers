@@ -6,7 +6,7 @@
 /*   By: nlaurids <nlaurids@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/30 14:16:11 by nlaurids          #+#    #+#             */
-/*   Updated: 2021/10/19 13:50:39 by nlaurids         ###   ########.fr       */
+/*   Updated: 2021/10/22 14:09:50 by nlaurids         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ typedef struct s_philo
 	pthread_mutex_t	*mutex;
 	pthread_mutex_t	write;
 	pthread_mutex_t	protect;
+	pthread_mutex_t	exit;
 	t_threads		*threads;
 }	t_philo;
 
